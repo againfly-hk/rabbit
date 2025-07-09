@@ -26,7 +26,7 @@ void bindControllerThreadToCPU(int cpu_id) {
     }
 }
 
-void controllerThreadFunc(std::atomic<bool>& keepRunning, VisionQueue& visionQueue) {
+void controllerThreadFunc(std::atomic<bool>& keepRunnin) {
     bindControllerThreadToCPU(1);
 
     if (gpioInitialise() < 0) {
@@ -42,11 +42,6 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning, VisionQueue& visionQue
     }
 
     while (keepRunning.load()) {
-        if (!visionQueue.empty()) {
-            Point p = visionQueue.wait_and_pop();
-            // Process the point p as needed
-            std::cout << "Received point: (" << p.x << ", " << p.y << ")" << std::endl;
-        }
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 

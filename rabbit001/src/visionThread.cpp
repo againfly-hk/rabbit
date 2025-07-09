@@ -108,9 +108,6 @@ void visionThreadFunc(std::atomic<bool>& keepRunning, VisionQueue& visionQueue) 
             lastTime = now;
             std::cout << "FPS: " << fps << std::endl;
         }
-
-        cv::imshow("Feed", frame);
-        cv::waitKey(1);
     }
 
     camera.release();
