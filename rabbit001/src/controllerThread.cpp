@@ -12,7 +12,7 @@ const int pwmFreq = 333;
 const int pwmRange = 300;
 const int pwmPins[4] = {17, 18, 14, 15};
 
-void bindThreadToCPU(int cpu_id) {
+void bindControllerThreadToCPU(int cpu_id) {
     cpu_set_t cpuset;
     CPU_ZERO(&cpuset);
     CPU_SET(cpu_id, &cpuset);
@@ -27,8 +27,8 @@ void bindThreadToCPU(int cpu_id) {
 }
 
 void controllerThreadFunc(std::atomic<bool>& keepRunning, VisionQueue& visionQueue) {
-    bindThreadToCPU(1);
-    
+    bindControllerThreadToCPU(1);
+
     if (gpioInitialise() < 0) {
         std::cerr << "GPIO initialization failed!" << std::endl;
         return;

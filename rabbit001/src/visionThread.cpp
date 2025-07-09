@@ -55,7 +55,7 @@ void visionThreadFunc(std::atomic<bool>& keepRunning, VisionQueue& visionQueue) 
 
     if (!camera.open()) {
         std::cerr << "无法打开摄像头!" << std::endl;
-        return -1;
+        return;
     }
 
     cv::Mat frame(240, 320, CV_8UC3);
@@ -110,7 +110,7 @@ void visionThreadFunc(std::atomic<bool>& keepRunning, VisionQueue& visionQueue) 
         }
 
         cv::imshow("Feed", frame);
-        if (cv::waitKey(1) == 27) break;
+        cv::waitKey(1);
     }
 
     camera.release();
