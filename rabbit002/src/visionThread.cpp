@@ -33,7 +33,7 @@ void bindThreadToCPU(int cpu_id) {
 }
 
 void visionThreadFunc(std::atomic<bool>& keepRunning) {
-    bindThreadToCPU(0);
+    bindThreadToCPU(2);
     raspicam::RaspiCam_Cv camera;
     camera.set(cv::CAP_PROP_FORMAT, CV_8UC3);           // 图像格式：彩色
     camera.set(cv::CAP_PROP_FRAME_WIDTH, 320);          // 图像宽度
@@ -89,7 +89,7 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
 }
 
 void imageProcessingThreadFunc(std::atomic<bool>& keepRunning) {
-    bindThreadToCPU(1);
+    bindThreadToCPU(3);
 
     int  frameCount = 0;
     int  fps = 0;
