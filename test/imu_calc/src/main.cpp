@@ -36,8 +36,7 @@ int main() {
     while (true) {
         imu.readAccel();
         imu.readGyro();
-        imu.readTempture();
-        const auto& raw_data = imu.getRawData();
+        imu.readTemperature();
 
         int file_num = current_file_num.load();
 
@@ -68,13 +67,13 @@ int main() {
         // 写入数据（仅当未满100条）
         if (outfile.is_open() && write_count[file_num] < 100) {
             std::lock_guard<std::mutex> lock(file_mutex);
-            outfile << raw_data.accel_x << " "
-                    << raw_data.accel_y << " "
-                    << raw_data.accel_z << " "
-                    << raw_data.gyro_x << " "
-                    << raw_data.gyro_y << " "
-                    << raw_data.gyro_z << " "
-                    << raw_data.temperature << std::endl;
+            outfile << imu.real_data.accel_x << " "
+                    << imu.real_data.accel_y << " "
+                    << imu.real_data.accel_z << " "
+                    << imu.real_data.gyro_x << " "
+                    << imu.real_data.gyro_y << " "
+                    << imu.real_data.gyro_z << " "
+                    << imu.real_data.temperature << std::endl;
 
             write_count[file_num]++;
 
