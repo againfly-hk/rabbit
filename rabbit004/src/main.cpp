@@ -14,20 +14,6 @@ void signalHandler(int signum) {
     keepRunning = false;
 }
 
-void bindMainThreadToCPU(int cpu_id) {
-    cpu_set_t cpuset;
-    CPU_ZERO(&cpuset);
-    CPU_SET(cpu_id, &cpuset);
-
-    pthread_t current_thread = pthread_self();
-    int rc = pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset);
-    if (rc != 0) {
-        std::cerr << "Error calling pthread_setaffinity_np: " << rc << std::endl;
-    } else {
-        std::cout << "Main thread bound to CPU " << cpu_id << std::endl;
-    }
-}
-
 int main() {
     setCurrentThreadAffinity(2, "mainThread");
     VisionQueue visionQueue;

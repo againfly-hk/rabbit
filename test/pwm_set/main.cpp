@@ -11,6 +11,9 @@ int main() {
         return 1;
     }
 
+    gpioSetMode(4, PI_OUTPUT);
+    gpioWrite(4, 1);
+
     std::cout << "GPIO initialized successfully." << std::endl;
 
     // 初始化 PWM 引脚

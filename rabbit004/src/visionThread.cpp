@@ -104,7 +104,7 @@ void imageProcessingThreadFunc(std::atomic<bool>& keepRunning) {
                 int cx = rect.x + rect.width / 2;
                 int cy = rect.y + rect.height / 2;
 
-                std::cout << "Center: (" << cx << ", " << cy << ")" << std::endl;
+                //std::cout << "Center: (" << cx << ", " << cy << ")" << std::endl;
             }
 
             frameCount++;
@@ -113,7 +113,7 @@ void imageProcessingThreadFunc(std::atomic<bool>& keepRunning) {
                 fps = frameCount;
                 frameCount = 0;
                 lastTime = now;
-                std::cout << "FPS: " << fps << std::endl;
+                //std::cout << "FPS: " << fps << std::endl;
             }
         } else if (image_ready_flag == 1 && image_flag == 0) {
             uchar* imgData = frame1.data;
@@ -137,7 +137,7 @@ void imageProcessingThreadFunc(std::atomic<bool>& keepRunning) {
                 int cx = rect.x + rect.width / 2;
                 int cy = rect.y + rect.height / 2;
 
-                std::cout << "Center: (" << cx << ", " << cy << ")" << std::endl;
+                //std::cout << "Center: (" << cx << ", " << cy << ")" << std::endl;
             }
 
             frameCount++;
@@ -146,7 +146,7 @@ void imageProcessingThreadFunc(std::atomic<bool>& keepRunning) {
                 fps = frameCount;
                 frameCount = 0;
                 lastTime = now;
-                std::cout << "FPS: " << fps << std::endl;
+                //std::cout << "FPS: " << fps << std::endl;
             }
         }
     }
