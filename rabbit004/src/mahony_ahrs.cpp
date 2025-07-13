@@ -10,18 +10,23 @@ MahonyAHRS::~MahonyAHRS() {}
 void MahonyAHRS::updateIMU(double gx, double gy, double gz,
                            double ax, double ay, double az,
                            double dt) {
+    double tempax = ay;
+    double tempay = ax;
+    double tempaz = -az;
+
+    ax = tempax;
+    ay = tempay;
+    az = tempaz;
+
     double norm = std::sqrt(ax * ax + ay * ay + az * az);
     if (norm > 1e-3) {
         ax /= norm;
         ay /= norm;
         az /= norm;
 
-        // double halfvx = q0 * q2 - q1 * q3;
-        // double halfvy = q0 * q1 + q2 * q3;
-        // double halfvz = q0 * q0 - 0.5f + q3 * q3;
-        double halfvx = 0;
-        double halfvy = 0;
-        double halfvz = 0;
+        double halfvx = q1 * q3 - q0 * q2;
+        double halfvy = q0 * q1 + q2 * q3;
+        double halfvz = q0 * q0 - 0.5f + q3 * q3;
 
         double halfex = (ay * halfvz - az * halfvy);
         double halfey = (az * halfvx - ax * halfvz);
@@ -45,7 +50,6 @@ void MahonyAHRS::updateIMU(double gx, double gy, double gz,
         gy += twoKp * halfey;
         gz += twoKp * halfez;
     }
-    
     gx *= 0.5f * dt;
     gy *= 0.5f * dt;
     gz *= 0.5f * dt;
@@ -68,7 +72,7 @@ void MahonyAHRS::updateIMU(double gx, double gy, double gz,
         q3 /= norm;
     }
 
-    yaw   = std::atan2(2.0f*(q1*q2 + q0*q3), q0*q0 + q1*q1 + q2*q2 + q3*q3);
-    pitch = std::asin(-2.0f*(q1*q3 + q0*q2));
-    roll  = std::atan2(2.0f*(q2*q3 + q0*q1), q0*q0 - q1*q1 - q2*q2 - q3*q3);
+    yaw = std::atan2(2.0f * (q0 * q3 + q1 * q2), 2.0f * (q0 * q0 + q1 * q1) - 1.0f);
+    pitch = std::asin(-2.0f * (q1 * q3 - q0 * q2));
+    roll = std::atan2(2.0f * (q0 * q1 + q2 * q3), 2.0f * (q0 * q0 + q3 * q3) - 1.0f);
 }
