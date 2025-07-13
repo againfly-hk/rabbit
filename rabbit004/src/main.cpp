@@ -16,7 +16,6 @@ void signalHandler(int signum) {
 
 int main() {
     setCurrentThreadAffinity(2, "mainThread");
-    VisionQueue visionQueue;
 
     std::signal(SIGINT, signalHandler);
     std::thread visionThread(visionThreadFunc, std::ref(keepRunning));
