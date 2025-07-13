@@ -71,7 +71,7 @@ static const uint8_t BMI088_accel_reg_config[BMI088_WRITE_ACCEL_REG_NUM][3] = {
 };
 
 static const uint8_t BMI088_gyro_reg_config[BMI088_WRITE_GYRO_REG_NUM][3] = {
-    {BMI088_GYRO_RANGE,                 BMI088_GYRO_500,                                       BMI088_GYRO_RANGE_ERROR},
+    {BMI088_GYRO_RANGE,                 BMI088_GYRO_500,                                        BMI088_GYRO_RANGE_ERROR},
     {BMI088_GYRO_BANDWIDTH,             BMI088_GYRO_100_32_HZ | BMI088_GYRO_BANDWIDTH_MUST_SET, BMI088_GYRO_BANDWIDTH_ERROR},
     {BMI088_GYRO_LPM1,                  BMI088_GYRO_NORMAL_MODE,                                BMI088_GYRO_LPM1_ERROR},
     {BMI088_GYRO_CTRL,                  BMI088_DRDY_ON,                                         BMI088_GYRO_CTRL_ERROR},

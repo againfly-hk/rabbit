@@ -1,6 +1,6 @@
-#include "visionData.h"
 #include "visionThread.h"
 #include "controllerThread.h"
+#include "threadAffinity.h"
 
 #include <thread>
 #include <atomic>
@@ -15,11 +15,12 @@ void signalHandler(int signum) {
 }
 
 int main() {
-    VisionQueue visionQueue;
+    setCurrentThreadAffinity(2, "mainThread");
 
     std::signal(SIGINT, signalHandler);
-    std::thread visionThread(visionThreadFunc, std::ref(keepRunning), std::ref(visionQueue));
-    std::thread controllerThread(controllerThreadFunc, std::ref(keepRunning), std::ref(visionQueue));
+    std::thread visionThread(visionThreadFunc, std::ref(keepRunning));
+    std::thread imageProcessingThread(imageProcessingThreadFunc, std::ref(keepRunning));
+    std::thread controllerThread(controllerThreadFunc, std::ref(keepRunning));
 
     visionThread.join();
     controllerThread.join();

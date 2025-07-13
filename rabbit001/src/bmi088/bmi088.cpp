@@ -13,8 +13,8 @@
 #define csGyro  7
 #define csAccel 8
 
-double bmi088_accel_sen = BMI088_ACCEL_12G_SEN;
-double bmi088_gyro_sen  = BMI088_GYRO_2000_SEN;
+double bmi088_accel_sen = BMI088_ACCEL_3G_SEN;
+double bmi088_gyro_sen  = BMI088_GYRO_500_SEN;
 
 BMI088::BMI088() {
     if (gpioInitialise() < 0) {
