@@ -18,11 +18,12 @@ int main() {
     setCurrentThreadAffinity(2, "mainThread");
 
     std::signal(SIGINT, signalHandler);
-    std::thread visionThread(visionThreadFunc, std::ref(keepRunning));
-    std::thread imageProcessingThread(imageProcessingThreadFunc, std::ref(keepRunning));
+    // std::thread visionThread(visionThreadFunc, std::ref(keepRunning));
+    // std::thread imageProcessingThread(imageProcessingThreadFunc, std::ref(keepRunning));
     std::thread controllerThread(controllerThreadFunc, std::ref(keepRunning));
 
-    visionThread.join();
+    // visionThread.join();
+    // imageProcessingThread.join();
     controllerThread.join();
 
     return 0;

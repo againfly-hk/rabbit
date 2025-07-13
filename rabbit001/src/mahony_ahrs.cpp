@@ -10,53 +10,39 @@ MahonyAHRS::~MahonyAHRS() {}
 void MahonyAHRS::updateIMU(double gx, double gy, double gz,
                            double ax, double ay, double az,
                            double dt) {
-    double tempax = ay;
-    double tempay = ax;
-    double tempaz = -az;
-    double tempgx = gy;
-    double tempgy = gx;
-    double tempgz = -gz;
 
-    ax = tempax;
-    ay = tempay;
-    az = tempaz;
-    gx = tempgx;
-    gy = tempgy;    
-    gz = tempgz;
-    
+    // double norm = std::sqrt(ax * ax + ay * ay + az * az);
+    // if (norm > 1e-3) {
+    //     ax /= norm;
+    //     ay /= norm;
+    //     az /= norm;
 
-    double norm = std::sqrt(ax * ax + ay * ay + az * az);
-    if (norm > 1e-3) {
-        ax /= norm;
-        ay /= norm;
-        az /= norm;
+    //     double halfvx = q1 * q3 - q0 * q2;
+    //     double halfvy = q0 * q1 + q2 * q3;
+    //     double halfvz = q0 * q0 - 0.5f + q3 * q3;
 
-        double halfvx = q1 * q3 - q0 * q2;
-        double halfvy = q0 * q1 + q2 * q3;
-        double halfvz = q0 * q0 - 0.5f + q3 * q3;
+    //     double halfex = (ay * halfvz - az * halfvy);
+    //     double halfey = (az * halfvx - ax * halfvz);
+    //     double halfez = (ax * halfvy - ay * halfvx);
 
-        double halfex = (ay * halfvz - az * halfvy);
-        double halfey = (az * halfvx - ax * halfvz);
-        double halfez = (ax * halfvy - ay * halfvx);
+    //     if (twoKi > 0.0f) {
+    //         integralFBx += twoKi * halfex * dt;
+    //         integralFBy += twoKi * halfey * dt;
+    //         integralFBz += twoKi * halfez * dt;
 
-        if (twoKi > 0.0f) {
-            integralFBx += twoKi * halfex * dt;
-            integralFBy += twoKi * halfey * dt;
-            integralFBz += twoKi * halfez * dt;
+    //         gx += integralFBx;
+    //         gy += integralFBy;
+    //         gz += integralFBz;
+    //     } else {
+    //         integralFBx = 0.0f;
+    //         integralFBy = 0.0f;
+    //         integralFBz = 0.0f;
+    //     }
 
-            gx += integralFBx;
-            gy += integralFBy;
-            gz += integralFBz;
-        } else {
-            integralFBx = 0.0f;
-            integralFBy = 0.0f;
-            integralFBz = 0.0f;
-        }
-
-        gx += twoKp * halfex;
-        gy += twoKp * halfey;
-        gz += twoKp * halfez;
-    }
+    //     gx += twoKp * halfex;
+    //     gy += twoKp * halfey;
+    //     gz += twoKp * halfez;
+    // }
     gx *= 0.5f * dt;
     gy *= 0.5f * dt;
     gz *= 0.5f * dt;

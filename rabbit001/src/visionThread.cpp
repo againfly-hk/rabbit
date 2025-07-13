@@ -12,9 +12,16 @@
 #define MIN_RB_DIFF     50
 #define MIN_AREA        1
 
+#define X_OFFSET 0
+#define Z_OFFSET 0
+
 uint8_t image_flag = 0;
 uint8_t image_ready_flag = 0;
 int image_index = 0;
+
+uint8_t detectFlag = 0;
+int detectx = 0;
+int detectz = 0;
 
 cv::Mat frame0(240, 320, CV_8UC3);
 cv::Mat frame1(240, 320, CV_8UC3);
@@ -116,7 +123,12 @@ void imageProcessingThreadFunc(std::atomic<bool>& keepRunning) {
                 int cx = rect.x + rect.width / 2;
                 int cy = rect.y + rect.height / 2;
 
-                //std::cout << "Center: (" << cx << ", " << cy << ")" << std::endl;
+                detectx = cx - X_OFFSET;
+                detectz = cy - Z_OFFSET;
+                detectFlag = 1;
+
+                std::cout << "Center: (" << cx << ", " << cy << ")" << std::endl;
+                std::cout << "Detected Position: (" << detectx << ", " << detectz << ")" << std::endl;
             }
 
             frameCount++;
@@ -149,7 +161,12 @@ void imageProcessingThreadFunc(std::atomic<bool>& keepRunning) {
                 int cx = rect.x + rect.width / 2;
                 int cy = rect.y + rect.height / 2;
 
-                //std::cout << "Center: (" << cx << ", " << cy << ")" << std::endl;
+                detectx = cx - X_OFFSET;
+                detectz = cy - Z_OFFSET;
+                detectFlag = 1;
+
+                std::cout << "Center: (" << cx << ", " << cy << ")" << std::endl;
+                std::cout << "Detected Position: (" << detectx << ", " << detectz << ")" << std::endl;
             }
 
             frameCount++;
