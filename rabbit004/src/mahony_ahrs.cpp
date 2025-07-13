@@ -13,10 +13,17 @@ void MahonyAHRS::updateIMU(double gx, double gy, double gz,
     double tempax = ay;
     double tempay = ax;
     double tempaz = -az;
+    double tempgx = gy;
+    double tempgy = gx;
+    double tempgz = -gz;
 
     ax = tempax;
     ay = tempay;
     az = tempaz;
+    gx = tempgx;
+    gy = tempgy;    
+    gz = tempgz;
+    
 
     double norm = std::sqrt(ax * ax + ay * ay + az * az);
     if (norm > 1e-3) {

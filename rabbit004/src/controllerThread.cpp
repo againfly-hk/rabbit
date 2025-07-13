@@ -9,10 +9,12 @@
 #include <chrono>
 #include <vector>
 #include <pthread.h>
+#include <fstream>
 
 const int pwmFreq = 333;
 const int pwmRange = 300;
 const int pwmPins[4] = {17, 18, 14, 15};
+const int pwmMid[4] = {148, 151, 158, 157};
 const int servoPowerPin = 4;
 
 const double imuAccelM[3][3]  = {{1.0089586369318100,       -0.00945613312305,      0.0095433941381734},
@@ -38,12 +40,15 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
     gpioSetMode(servoPowerPin, PI_OUTPUT);
     gpioWrite(servoPowerPin, 1);
     
-    for (int pin : pwmPins) { 
-        gpioSetMode(pin, PI_OUTPUT);
-        gpioSetPWMfrequency(pin, pwmFreq);
-        gpioSetPWMrange(pin, pwmRange);
-        gpioPWM(pin, 150);
+    for (int i = 0; i < 4; i++) { 
+        gpioSetMode(pwmPins[i], PI_OUTPUT);
+        gpioSetPWMfrequency(pwmPins[i], pwmFreq);
+        gpioSetPWMrange(pwmPins[i], pwmRange);
+        gpioPWM(pwmPins[i], pwmMid[i]);
     }
+
+    std::ofstream imuDataFile("imu_data.csv");
+    imuDataFile << "dtime,accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z" << std::endl;
 
     auto lastTime = std::chrono::high_resolution_clock::now();
     while (keepRunning.load()) {
@@ -66,6 +71,14 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
             imuCalibratedData.time = std::chrono::duration_cast<std::chrono::microseconds>(nowTime - lastTime).count() * 1e-6;
             lastTime = nowTime;
 
+            imuDateaFile << imuCalibratedData.time << ","
+                         << imuCalibratedData.accel_x << ","
+                         << imuCalibratedData.accel_y << ","
+                         << imuCalibratedData.accel_z << ","
+                         << imuCalibratedData.gyro_x << ","
+                         << imuCalibratedData.gyro_y << ","
+                         << imuCalibratedData.gyro_z << std::endl;
+            /*
             ahrs.updateIMU(imuCalibratedData.gyro_x, imuCalibratedData.gyro_y, imuCalibratedData.gyro_z,
                            imuCalibratedData.accel_x, imuCalibratedData.accel_y, imuCalibratedData.accel_z,
                            imuCalibratedData.time);
@@ -74,6 +87,7 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
                       << "pitch: " << ahrs.pitch << ", "
                       << "roll: " << ahrs.roll << ", "
                       << "yaw: " << ahrs.yaw << std::endl;
+            */
         } else {
             imuCount++;
             if (imuCount == 100) {
@@ -81,10 +95,9 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
                 lastTime = std::chrono::high_resolution_clock::now();
             }
         }
-
-
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
+    imuDateaFile.close();
     gpioTerminate();
 }

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <chrono>
 #include <cstdint>
+#include <fstream>
 
 #define GREEN_THRESHOLD 200
 #define MIN_RB_DIFF     100
@@ -13,6 +14,7 @@
 
 uint8_t image_flag = 0;
 uint8_t image_ready_flag = 0;
+int image_index = 0;
 
 cv::Mat frame0(240, 320, CV_8UC3);
 cv::Mat frame1(240, 320, CV_8UC3);
@@ -54,12 +56,21 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
 
     while (keepRunning.load()) {
         camera.grab();
+        std::ostringstream filename;
+        filename << "image_" << std::setw(6) << std::setfill('0') << image_index << ".raw";
+
         if (image_flag == 0) {
             camera.retrieve(frame0);
             if (frame0.empty()) {
                 std::cerr << "Failed to retrieve frame!" << std::endl;
                 break;
             }
+
+            std::ofstream raw_file(filename.str(), std::ios::out | std::ios::binary);
+            raw_file.write(reinterpret_cast<const char*>(frame0.data), frame0.total() * frame0.elemSize());
+            raw_file.close();
+            image_index++;
+
             image_flag = 1;
             image_ready_flag = 1;
         } else if (image_flag == 1) {
@@ -68,6 +79,12 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
                 std::cerr << "Failed to retrieve frame!" << std::endl;
                 break;
             }
+
+            std::ofstream raw_file(filename.str(), std::ios::out | std::ios::binary);
+            raw_file.write(reinterpret_cast<const char*>(frame1.data), frame1.total() * frame1.elemSize());
+            raw_file.close();
+            image_index++;
+
             image_flag = 0;
             image_ready_flag = 1;
         }
