@@ -3,7 +3,7 @@
 
 class MahonyAHRS {
 public:
-    MahonyAHRS(double twoKp = 2.0f, double twoKi = 0, double q0 = 1.0f, double q1 = 0.0f, double q2 = 0.0f, double q3 = 0.0f);
+    MahonyAHRS(double twoKp = 2.0f, double twoKi = 0, double q0 = 0.95f, double q1 = 0.0f, double q2 = 0.0f, double q3 = 0.30f);
     ~MahonyAHRS();
 
     void updateIMU(double gx, double gy, double gz,

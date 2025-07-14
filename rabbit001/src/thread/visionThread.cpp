@@ -81,7 +81,7 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
             image_flag = 1;
             image_ready_flag = 1;
 
-            saveImage(frame0);
+            // saveImage(frame0);
         } else if (image_flag == 1) {
             camera.retrieve(frame1);
             if (frame1.empty()) {
@@ -92,7 +92,7 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
             image_flag = 0;
             image_ready_flag = 1;
 
-            saveImage(frame1);
+            // saveImage(frame1);
         }
     }
     camera.release();

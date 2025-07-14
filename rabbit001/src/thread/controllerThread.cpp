@@ -169,7 +169,9 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
             ahrs.updateIMU(imuCalibratedData.gyro_x, imuCalibratedData.gyro_y, imuCalibratedData.gyro_z,
                            imuCalibratedData.accel_x, imuCalibratedData.accel_y, imuCalibratedData.accel_z,
                            imuCalibratedData.time);
-
+            
+            std::cout << "Yaw: " << ahrs.yaw << ", Pitch: " << ahrs.pitch << ", Roll: " << ahrs.roll << std::endl;
+            
             imuDataFile << imuCalibratedData.time       << ","
                         << imuCalibratedData.accel_x    << ","
                         << imuCalibratedData.accel_y    << ","
