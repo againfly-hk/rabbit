@@ -3,9 +3,9 @@
 #include <opencv2/opencv.hpp>
 #include <raspicam/raspicam_cv.h>
 
-const int board_width = 12;   // 列方向角点数
-const int board_height = 8;   // 行方向角点数
-const float square_size = 0.02f;  // 每个方格边长为 20mm = 0.02m
+const int board_width = 6;
+const int board_height = 4;
+const float square_size = 0.04f;
 
 const int num_images_to_capture = 15;
 
@@ -47,6 +47,7 @@ int main() {
 
     int captured = 0;
     cv::Mat frame, gray;
+    cv::Size pattern_size(board_width, board_height);
 
     while (captured < num_images_to_capture) {
         camera.grab();
@@ -54,7 +55,7 @@ int main() {
 
         cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
         std::vector<cv::Point2f> corners;
-        bool found = cv::findChessboardCorners(gray, cv::Size(board_width, board_height), corners);
+        bool found = cv::findChessboardCorners(gray, pattern_size, corners);
 
         if (found) {
             cv::cornerSubPix(gray, corners, cv::Size(11, 11), cv::Size(-1, -1),
@@ -62,38 +63,38 @@ int main() {
             image_points.push_back(corners);
             object_points.push_back(objp);
             captured++;
-            std::cout << "Captured image " << captured << "/" << num_images_to_capture << std::endl;
-            cv::drawChessboardCorners(frame, cv::Size(board_width, board_height), corners, found);
+            std::cout << "✅ Captured image " << captured << "/" << num_images_to_capture << std::endl;
+            cv::drawChessboardCorners(frame, pattern_size, corners, found);
             cv::imshow("Captured", frame);
-            cv::waitKey(500); // 等待 500ms 显示
+            cv::waitKey(500);
         }
 
         cv::imshow("Live", frame);
-        if (cv::waitKey(30) == 27) break; // 按下 ESC 退出
+        if (cv::waitKey(30) == 27) break; // ESC退出
     }
 
+    camera.release();
     cv::destroyAllWindows();
 
-    std::cout << "Calibrating..." << std::endl;
+    std::cout << "\n🔧 Calibrating camera..." << std::endl;
 
-    cv::Mat camera_matrix, dist_coeffs, R, T;
+    cv::Mat camera_matrix, dist_coeffs;
     std::vector<cv::Mat> rvecs, tvecs;
 
     double rms = cv::calibrateCamera(object_points, image_points, gray.size(),
                                      camera_matrix, dist_coeffs, rvecs, tvecs);
 
-    std::cout << "Calibration RMS error: " << rms << std::endl;
-    std::cout << "Camera Matrix:\n" << camera_matrix << std::endl;
-    std::cout << "Distortion Coefficients:\n" << dist_coeffs << std::endl;
+    std::cout << "✅ RMS error: " << rms << std::endl;
+    std::cout << "📷 Camera Matrix:\n" << camera_matrix << std::endl;
+    std::cout << "📉 Distortion Coefficients:\n" << dist_coeffs << std::endl;
 
-    // 保存参数
+    // 保存标定结果
     cv::FileStorage fs("camera_calibration.yaml", cv::FileStorage::WRITE);
     fs << "camera_matrix" << camera_matrix;
     fs << "distortion_coefficients" << dist_coeffs;
     fs.release();
 
-    std::cout << "Calibration saved to camera_calibration.yaml" << std::endl;
+    std::cout << "📂 Calibration saved to camera_calibration.yaml" << std::endl;
 
-    camera.release();
     return 0;
 }
