@@ -184,7 +184,7 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
                         << ahrs.roll                    << ","
                         << std::endl;
             if (flyFlag) {
-                flyTime = std::chrono::duration_cast<std::chrono::microseconds>(nowTime).count() * 1e-6 - startFlyTime;
+                flyTime = nowTime.time_since_epoch().count() * 1e-9 - startFlyTime; // Convert to seconds
                 std::cout << "Flight time: " << flyTime << " seconds" << std::endl;
                 if(flyTime > 4.0) {
                     flyFlag = 0;
@@ -202,7 +202,7 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
                     pitchControl = 0;
                     rollControl = 0;
                     rabbitServoController();
-                    startFlyTime = std::chrono::duration_cast<std::chrono::microseconds>(nowTime).count() * 1e-6;
+                    startFlyTime = nowTime.time_since_epoch().count() * 1e-9; // Convert to seconds
                 }
             }
         } else {
