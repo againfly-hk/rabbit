@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(MyRaspberryPiProject)
+project(RabbitMissileProject)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,6 +11,8 @@ find_package(OpenCV REQUIRED)
 include_directories(
     ${PROJECT_SOURCE_DIR}/inc
     ${PROJECT_SOURCE_DIR}/inc/bmi088
+    ${PROJECT_SOURCE_DIR}/inc/algorithm
+    ${PROJECT_SOURCE_DIR}/inc/thread
 )
 
 # Find pigpio
@@ -28,11 +30,13 @@ include_directories(${RASPICAM_INCLUDE_DIR})
 file(GLOB SRC
     src/*.cpp
     src/bmi088/*.cpp
+    src/algorithm/*.cpp
+    src/thread/*.cpp
 )
 
-add_executable(main ${SRC})
+add_executable(rabbit ${SRC})
 
-target_link_libraries(main
+target_link_libraries(rabbit
     ${OpenCV_LIBS}
     ${PIGPIO_LIB}
     ${PTHREAD_LIB}

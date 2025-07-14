@@ -15,18 +15,30 @@
 #define X_OFFSET 0
 #define Z_OFFSET 0
 
+/* log index */
+int     image_index = 0;
+
+/* controller */
+uint8_t detectflag  = 0;
+int     detecty     = 0;
+int     detectz     = 0;
+
+/* double buffer */
 uint8_t image_flag = 0;
 uint8_t image_ready_flag = 0;
-int image_index = 0;
-
-uint8_t detectFlag = 0;
-int detectx = 0;
-int detectz = 0;
-
 cv::Mat frame0(240, 320, CV_8UC3);
 cv::Mat frame1(240, 320, CV_8UC3);
 cv::Mat mask(240, 320, CV_8UC1);
 std::vector<std::vector<cv::Point>> contours;
+
+void saveImage(const cv::Mat& image) {
+    std::ostringstream filename;
+    filename << "image_" << std::setw(6) << std::setfill('0') << image_index << ".raw";
+    std::ofstream raw_file(filename.str(), std::ios::out | std::ios::binary);
+    raw_file.write(reinterpret_cast<const char*>(image.data), image.total() * image.elemSize());
+    raw_file.close();
+    image_index++;
+}
 
 void visionThreadFunc(std::atomic<bool>& keepRunning) {
     setCurrentThreadAffinity(3, "visionThread");
@@ -37,7 +49,7 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
     camera.set(cv::CAP_PROP_FPS, 90);                   // Frame rate
 
     camera.set(cv::CAP_PROP_AUTO_EXPOSURE, 0);          // Auto exposure (depends on driver support)
-    camera.set(cv::CAP_PROP_EXPOSURE, 1);               // Exposure value
+    camera.set(cv::CAP_PROP_EXPOSURE, 5);               // Exposure value
 
     camera.set(cv::CAP_PROP_AUTO_WB, 0);                // Auto white balance (depends on driver support)
     camera.set(cv::CAP_PROP_WB_TEMPERATURE, 4000);      // White balance temperature (depends on driver support)
@@ -58,8 +70,6 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
 
     while (keepRunning.load()) {
         camera.grab();
-        std::ostringstream filename;
-        filename << "image_" << std::setw(6) << std::setfill('0') << image_index << ".raw";
 
         if (image_flag == 0) {
             camera.retrieve(frame0);
@@ -68,13 +78,10 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
                 break;
             }
 
-            std::ofstream raw_file(filename.str(), std::ios::out | std::ios::binary);
-            raw_file.write(reinterpret_cast<const char*>(frame0.data), frame0.total() * frame0.elemSize());
-            raw_file.close();
-            image_index++;
-
             image_flag = 1;
             image_ready_flag = 1;
+
+            saveImage(frame0);
         } else if (image_flag == 1) {
             camera.retrieve(frame1);
             if (frame1.empty()) {
@@ -82,13 +89,10 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
                 break;
             }
 
-            std::ofstream raw_file(filename.str(), std::ios::out | std::ios::binary);
-            raw_file.write(reinterpret_cast<const char*>(frame1.data), frame1.total() * frame1.elemSize());
-            raw_file.close();
-            image_index++;
-
             image_flag = 0;
             image_ready_flag = 1;
+
+            saveImage(frame1);
         }
     }
     camera.release();
@@ -102,80 +106,68 @@ void imageProcessingThreadFunc(std::atomic<bool>& keepRunning) {
     auto lastTime = std::chrono::high_resolution_clock::now();
     while (keepRunning.load()) {
         if (image_ready_flag == 1 && image_flag == 1) {
+            image_ready_flag = 0;
             uchar* imgData = frame0.data;
             uchar* maskData = mask.data;
             int totalPixels = frame0.rows * frame0.cols;
-
             for (int i = 0; i < totalPixels; i++) {
                 uchar b = imgData[i * 3];
                 uchar g = imgData[i * 3 + 1];
                 uchar r = imgData[i * 3 + 2];
                 maskData[i] = (g > GREEN_THRESHOLD && g - r > MIN_RB_DIFF && g - b > MIN_RB_DIFF) ? 255 : 0;
             }
-
             contours.clear();
             cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
             for (const auto& contour : contours) {
                 if (cv::contourArea(contour) < MIN_AREA) continue;
 
                 cv::Rect rect = cv::boundingRect(contour);
-                int cx = rect.x + rect.width / 2;
+                int cz = rect.x + rect.width / 2;
                 int cy = rect.y + rect.height / 2;
 
-                detectx = cx - X_OFFSET;
-                detectz = cy - Z_OFFSET;
-                detectFlag = 1;
-
-                std::cout << "Center: (" << cx << ", " << cy << ")" << std::endl;
-                std::cout << "Detected Position: (" << detectx << ", " << detectz << ")" << std::endl;
+                detectflag = 0;
+                detectz = cz - X_OFFSET;
+                detecty = cy - Z_OFFSET;
+                detectfag = 1;
             }
-
             frameCount++;
             auto now = std::chrono::high_resolution_clock::now();
             if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTime).count() > 1000) {
                 fps = frameCount;
                 frameCount = 0;
                 lastTime = now;
-                //std::cout << "FPS: " << fps << std::endl;
             }
         } else if (image_ready_flag == 1 && image_flag == 0) {
+            image_ready_flag = 0;
             uchar* imgData = frame1.data;
             uchar* maskData = mask.data;
             int totalPixels = frame1.rows * frame1.cols;
-
             for (int i = 0; i < totalPixels; i++) {
                 uchar b = imgData[i * 3];
                 uchar g = imgData[i * 3 + 1];
                 uchar r = imgData[i * 3 + 2];
                 maskData[i] = (g > GREEN_THRESHOLD && g - r > MIN_RB_DIFF && g - b > MIN_RB_DIFF) ? 255 : 0;
             }
-
             contours.clear();
             cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
             for (const auto& contour : contours) {
                 if (cv::contourArea(contour) < MIN_AREA) continue;
 
                 cv::Rect rect = cv::boundingRect(contour);
-                int cx = rect.x + rect.width / 2;
+                int cz = rect.x + rect.width / 2;
                 int cy = rect.y + rect.height / 2;
 
-                detectx = cx - X_OFFSET;
-                detectz = cy - Z_OFFSET;
-                detectFlag = 1;
-
-                std::cout << "Center: (" << cx << ", " << cy << ")" << std::endl;
-                std::cout << "Detected Position: (" << detectx << ", " << detectz << ")" << std::endl;
+                detectflag = 0;
+                detectz = cz - X_OFFSET;
+                detecty = cy - Z_OFFSET;
+                detectflag = 1;
             }
-
             frameCount++;
             auto now = std::chrono::high_resolution_clock::now();
             if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTime).count() > 1000) {
                 fps = frameCount;
                 frameCount = 0;
                 lastTime = now;
-                //std::cout << "FPS: " << fps << std::endl;
             }
         }
     }
