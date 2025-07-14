@@ -31,6 +31,9 @@ cv::Mat frame1(240, 320, CV_8UC3);
 cv::Mat mask(240, 320, CV_8UC1);
 std::vector<std::vector<cv::Point>> contours;
 
+/* fly control */
+extern uint8_t fly_flag;
+
 void saveImage(const cv::Mat& image) {
     std::ostringstream filename;
     filename << "image_" << std::setw(6) << std::setfill('0') << image_index << ".raw";
@@ -81,7 +84,9 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
             image_flag = 1;
             image_ready_flag = 1;
 
-            // saveImage(frame0);
+            if (fly_flag) {
+                saveImage(frame0);
+            }
         } else if (image_flag == 1) {
             camera.retrieve(frame1);
             if (frame1.empty()) {
@@ -91,8 +96,9 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
 
             image_flag = 0;
             image_ready_flag = 1;
-
-            // saveImage(frame1);
+            if (fly_flag) {
+                saveImage(frame1);
+            }
         }
     }
     camera.release();
@@ -128,7 +134,7 @@ void imageProcessingThreadFunc(std::atomic<bool>& keepRunning) {
                 detectflag = 0;
                 detectz = cz - X_OFFSET;
                 detecty = cy - Z_OFFSET;
-                detectfag = 1;
+                detectflag = 1;
             }
             frameCount++;
             auto now = std::chrono::high_resolution_clock::now();

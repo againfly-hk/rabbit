@@ -139,7 +139,7 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
     }
 
     std::ofstream imuDataFile("imu_data.csv");
-    imuDataFile << "dtime,accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z,yaw,pitch,roll" << std::endl;
+    imuDataFile << "dtime,accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z,yaw,pitch,roll,detect_z,detect_y,fly_time" << std::endl;
 
     auto lastTime = std::chrono::high_resolution_clock::now();
     while (keepRunning.load()) {
@@ -169,20 +169,7 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
             ahrs.updateIMU(imuCalibratedData.gyro_x, imuCalibratedData.gyro_y, imuCalibratedData.gyro_z,
                            imuCalibratedData.accel_x, imuCalibratedData.accel_y, imuCalibratedData.accel_z,
                            imuCalibratedData.time);
-            
-            std::cout << "Yaw: " << ahrs.yaw << ", Pitch: " << ahrs.pitch << ", Roll: " << ahrs.roll << std::endl;
-            
-            imuDataFile << imuCalibratedData.time       << ","
-                        << imuCalibratedData.accel_x    << ","
-                        << imuCalibratedData.accel_y    << ","
-                        << imuCalibratedData.accel_z    << ","
-                        << imuCalibratedData.gyro_x     << ","
-                        << imuCalibratedData.gyro_y     << ","
-                        << imuCalibratedData.gyro_z     << ","
-                        << ahrs.yaw                     << ","
-                        << ahrs.pitch                   << ","
-                        << ahrs.roll                    << ","
-                        << std::endl;
+        
             if (flyFlag) {
                 flyTime = nowTime.time_since_epoch().count() * 1e-9 - startFlyTime; // Convert to seconds
                 std::cout << "Flight time: " << flyTime << " seconds" << std::endl;
@@ -192,10 +179,25 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
                     std::cout << "Flight time exceeded 4 seconds, stopping flight." << std::endl;
                     break;
                 }
+
+                imuDataFile << imuCalibratedData.time       << ","
+                            << imuCalibratedData.accel_x    << ","
+                            << imuCalibratedData.accel_y    << ","
+                            << imuCalibratedData.accel_z    << ","
+                            << imuCalibratedData.gyro_x     << ","
+                            << imuCalibratedData.gyro_y     << ","
+                            << imuCalibratedData.gyro_z     << ","
+                            << ahrs.yaw                     << ","
+                            << ahrs.pitch                   << ","
+                            << ahrs.roll                    << ","
+                            << detectz                      << ","
+                            << detecty                      << ","
+                            << flyTime                      << ","
+                            << std::endl;
                 // Control logic based on vision detection
                 
             } else {
-                if(imuCalibratedData.accel_x > 2.5) {
+                if(imuCalibratedData.accel_x > 25) {
                     flyFlag = 1;
                     gpioWrite(servoPowerPin, 1);
                     yawControl = 0;

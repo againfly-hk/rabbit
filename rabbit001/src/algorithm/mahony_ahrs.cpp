@@ -68,7 +68,7 @@ void MahonyAHRS::updateIMU(double gx, double gy, double gz,
         q3 /= norm;
     }
 
-    yaw = std::atan2(2.0f * (q0 * q2 + q1 * q3), 1.0f - 2.0f * (q2 * q2 + q3 * q3));
-    pitch = std::asin(2.0f * (q0 * q3 - q1 * q2));
-    roll = std::atan2(2.0f * (q0 * q1 + q2 * q3), 1.0f - 2.0f * (q1 * q1 + q3 * q3));
+    yaw = std::atan2(-2.0f * (q0 * q2 + q1 * q3), -1.0f + 2.0f * (q2 * q2 + q3 * q3));
+    pitch = std::asin(-2.0f * (q0 * q3 - q1 * q2));
+    roll = std::atan2(-2.0f * (q0 * q1 + q2 * q3), 1.0f - 2.0f * (q1 * q1 + q3 * q3));
 }
