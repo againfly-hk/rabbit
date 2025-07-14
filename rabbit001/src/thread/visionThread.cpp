@@ -32,7 +32,7 @@ cv::Mat mask(240, 320, CV_8UC1);
 std::vector<std::vector<cv::Point>> contours;
 
 /* fly control */
-extern uint8_t fly_flag;
+extern uint8_t flyFlag;
 
 void saveImage(const cv::Mat& image) {
     std::ostringstream filename;
@@ -84,7 +84,7 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
             image_flag = 1;
             image_ready_flag = 1;
 
-            if (fly_flag) {
+            if (flyFlag) {
                 saveImage(frame0);
             }
         } else if (image_flag == 1) {
@@ -96,7 +96,7 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
 
             image_flag = 0;
             image_ready_flag = 1;
-            if (fly_flag) {
+            if (flyFlag) {
                 saveImage(frame1);
             }
         }
