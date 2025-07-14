@@ -195,15 +195,6 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
                             << flyTime                      << ","
                             << std::endl;
                 // Control logic based on vision detection
-
-                PID_calc(&rollPid, ahrs.roll, 0.0f);
-                PID_calc(&dRollPid, imuCalibratedData.gyro_x, rollPid.out);
-
-                PID_calc(&yawPid, ahrs.yaw, ahrs.yaw);
-                PID_calc(&dYawPid, imuCalibratedData.gyro_y, yawPid.out);
-
-                PID_calc(&pitchPid, ahrs.pitch, ahrs.pitch);
-                PID_calc(&dPitchPid, imuCalibratedData.gyro_z, pitchPid.out);
                 
             } else {
                 if(imuCalibratedData.accel_x > 25) {
