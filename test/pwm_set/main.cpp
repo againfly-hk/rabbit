@@ -16,12 +16,11 @@ int main() {
 
     std::cout << "GPIO initialized successfully." << std::endl;
 
-    // 初始化 PWM 引脚
     for (int i = 0; i < 4; ++i) {
         gpioSetMode(pwmPins[i], PI_OUTPUT);
         gpioSetPWMfrequency(pwmPins[i], pwmFreq);
         gpioSetPWMrange(pwmPins[i], pwmRange);
-        gpioPWM(pwmPins[i], 150);  // 初始设为0
+        gpioPWM(pwmPins[i], 150);
     }
 
     std::cout << "Enter pin index (0-3) and PWM value (0-" << pwmRange << "), e.g., `1 150`" << std::endl;

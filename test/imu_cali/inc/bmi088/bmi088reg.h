@@ -99,7 +99,6 @@
 #define BMI088_ACCEL_SOFTRESET                  0x7E
 #define BMI088_ACCEL_SOFTRESET_VALUE            0xB6
 
-// WHO AM I REGISTER
 #define BMI088_GYRO_CHIP_ID                     0x00
 #define BMI088_GYRO_CHIP_ID_VALUE               0x0F
 
@@ -122,7 +121,6 @@
 #define BMI088_GYRO_250                         (0x3 << BMI088_GYRO_RANGE_SHIFTS)
 #define BMI088_GYRO_125                         (0x4 << BMI088_GYRO_RANGE_SHIFTS)
 
-// BMI088_GYRO_RATE_BANDWIDTH_HZ
 #define BMI088_GYRO_BANDWIDTH                   0x10
 #define BMI088_GYRO_BANDWIDTH_MUST_SET          0x80
 #define BMI088_GYRO_2000_532_HZ                 0x00

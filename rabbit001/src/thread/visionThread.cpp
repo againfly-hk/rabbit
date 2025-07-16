@@ -46,25 +46,27 @@ void saveImage(const cv::Mat& image) {
 void visionThreadFunc(std::atomic<bool>& keepRunning) {
     setCurrentThreadAffinity(3, "visionThread");
     raspicam::RaspiCam_Cv camera;
-    camera.set(cv::CAP_PROP_FORMAT, CV_8UC3);           // Image format: color
-    camera.set(cv::CAP_PROP_FRAME_WIDTH, 320);          // Image width
-    camera.set(cv::CAP_PROP_FRAME_HEIGHT, 240);         // Image height
-    camera.set(cv::CAP_PROP_FPS, 90);                   // Frame rate
+    camera.set(cv::CAP_PROP_FORMAT, CV_8UC3);
+    camera.set(cv::CAP_PROP_FRAME_WIDTH, 320);
+    camera.set(cv::CAP_PROP_FRAME_HEIGHT, 240);
+    camera.set(cv::CAP_PROP_FPS, 90);
 
-    camera.set(cv::CAP_PROP_AUTO_EXPOSURE, 0);          // Auto exposure (depends on driver support)
-    camera.set(cv::CAP_PROP_EXPOSURE, 5);               // Exposure value
+    camera.set(cv::CAP_PROP_AUTO_EXPOSURE, 0);
+    camera.set(cv::CAP_PROP_EXPOSURE, 0);
 
-    camera.set(cv::CAP_PROP_AUTO_WB, 0);                // Auto white balance (depends on driver support)
-    camera.set(cv::CAP_PROP_WB_TEMPERATURE, 4000);      // White balance temperature (depends on driver support)
-    camera.set(cv::CAP_PROP_WHITE_BALANCE_RED_V, 100);   // White balance for red channel
-    camera.set(cv::CAP_PROP_WHITE_BALANCE_BLUE_U, 100);  // White balance for blue channel
+    camera.set(cv::CAP_PROP_AUTO_WB, 0);
+    camera.set(cv::CAP_PROP_WHITE_BALANCE_RED_V, 100);
+    camera.set(cv::CAP_PROP_WHITE_BALANCE_BLUE_U, 100);
+    camera.set(cv::CAP_PROP_WB_TEMPERATURE, 4000);
 
-    camera.set(cv::CAP_PROP_BRIGHTNESS, 50);            // Brightness
-    camera.set(cv::CAP_PROP_CONTRAST, 50);              // Contrast
-    camera.set(cv::CAP_PROP_SATURATION, 50);            // Saturation
-    camera.set(cv::CAP_PROP_GAIN, 1);                   // Gain
-    camera.set(cv::CAP_PROP_SHARPNESS, 20);             // Sharpness (depends on driver support)
-    camera.set(cv::CAP_PROP_MODE, 0);                   // Mode
+    camera.set(cv::CAP_PROP_GAIN, 1);
+
+    camera.set(cv::CAP_PROP_BRIGHTNESS, 50);
+    camera.set(cv::CAP_PROP_CONTRAST, 0);
+    camera.set(cv::CAP_PROP_SATURATION, 0);
+    camera.set(cv::CAP_PROP_SHARPNESS, 0);
+
+    camera.set(cv::CAP_PROP_MODE, 0);
 
     if (!camera.open()) {
         std::cerr << "Failed to open camera!" << std::endl;

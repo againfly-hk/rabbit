@@ -15,17 +15,22 @@ int main() {
     camera.set(cv::CAP_PROP_FRAME_WIDTH, 320);
     camera.set(cv::CAP_PROP_FRAME_HEIGHT, 240);
     camera.set(cv::CAP_PROP_FPS, 90);
+
     camera.set(cv::CAP_PROP_AUTO_EXPOSURE, 0);
-    camera.set(cv::CAP_PROP_EXPOSURE, 5);
+    camera.set(cv::CAP_PROP_EXPOSURE, 0);
+
     camera.set(cv::CAP_PROP_AUTO_WB, 0);
-    camera.set(cv::CAP_PROP_WB_TEMPERATURE, 4000);
     camera.set(cv::CAP_PROP_WHITE_BALANCE_RED_V, 100);
     camera.set(cv::CAP_PROP_WHITE_BALANCE_BLUE_U, 100);
-    camera.set(cv::CAP_PROP_BRIGHTNESS, 50);
-    camera.set(cv::CAP_PROP_CONTRAST, 50);
-    camera.set(cv::CAP_PROP_SATURATION, 50);
+    camera.set(cv::CAP_PROP_WB_TEMPERATURE, 4000);
+
     camera.set(cv::CAP_PROP_GAIN, 1);
-    camera.set(cv::CAP_PROP_SHARPNESS, 20);
+
+    camera.set(cv::CAP_PROP_BRIGHTNESS, 50);
+    camera.set(cv::CAP_PROP_CONTRAST, 0);
+    camera.set(cv::CAP_PROP_SATURATION, 0);
+    camera.set(cv::CAP_PROP_SHARPNESS, 0);
+
     camera.set(cv::CAP_PROP_MODE, 0);
 
     if (!camera.open()) {
@@ -63,20 +68,20 @@ int main() {
             image_points.push_back(corners);
             object_points.push_back(objp);
             captured++;
-            std::cout << "✅ Captured image " << captured << "/" << num_images_to_capture << std::endl;
+            std::cout << "Captured image " << captured << "/" << num_images_to_capture << std::endl;
             cv::drawChessboardCorners(frame, pattern_size, corners, found);
             cv::imshow("Captured", frame);
             cv::waitKey(500);
         }
 
         cv::imshow("Live", frame);
-        if (cv::waitKey(30) == 27) break; // ESC退出
+        if (cv::waitKey(30) == 27) break;
     }
 
     camera.release();
     cv::destroyAllWindows();
 
-    std::cout << "\n🔧 Calibrating camera..." << std::endl;
+    std::cout << "\nCalibrating camera..." << std::endl;
 
     cv::Mat camera_matrix, dist_coeffs;
     std::vector<cv::Mat> rvecs, tvecs;
@@ -84,17 +89,16 @@ int main() {
     double rms = cv::calibrateCamera(object_points, image_points, gray.size(),
                                      camera_matrix, dist_coeffs, rvecs, tvecs);
 
-    std::cout << "✅ RMS error: " << rms << std::endl;
-    std::cout << "📷 Camera Matrix:\n" << camera_matrix << std::endl;
-    std::cout << "📉 Distortion Coefficients:\n" << dist_coeffs << std::endl;
+    std::cout << "RMS error: " << rms << std::endl;
+    std::cout << "Camera Matrix:\n" << camera_matrix << std::endl;
+    std::cout << "Distortion Coefficients:\n" << dist_coeffs << std::endl;
 
-    // 保存标定结果
     cv::FileStorage fs("camera_calibration.yaml", cv::FileStorage::WRITE);
     fs << "camera_matrix" << camera_matrix;
     fs << "distortion_coefficients" << dist_coeffs;
     fs.release();
 
-    std::cout << "📂 Calibration saved to camera_calibration.yaml" << std::endl;
+    std::cout << "Calibration saved to camera_calibration.yaml" << std::endl;
 
     return 0;
 }
