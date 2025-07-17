@@ -10,12 +10,12 @@ MahonyAHRS::~MahonyAHRS() {}
 
 void MahonyAHRS::updateIMU(double gx, double gy, double gz,
                            double ax, double ay, double az,
-                           double dt) {
+                           double dt, int mode) {
 
     double norm = std::sqrt(ax * ax + ay * ay + az * az);
-    if (norm > 25.0f) {
+    if (norm > 15.0f) {
         return;
-    } else if (norm > 8.0f) {
+    } else if (norm > 7.0f && mode == 0) {
         ax /= norm;
         ay /= norm;
         az /= norm;
@@ -45,6 +45,10 @@ void MahonyAHRS::updateIMU(double gx, double gy, double gz,
         gx += twoKp * halfex;
         gy += twoKp * halfey;
         gz += twoKp * halfez;
+    } else if (mode == 1) {
+        integralFBx = 0.0f;
+        integralFBy = 0.0f;
+        integralFBz = 0.0f;
     }
     gx *= 0.5f * dt;
     gy *= 0.5f * dt;

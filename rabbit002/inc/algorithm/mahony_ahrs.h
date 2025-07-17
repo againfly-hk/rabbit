@@ -8,7 +8,7 @@ public:
 
     void updateIMU(double gx, double gy, double gz,
                    double ax, double ay, double az,
-                   double dt);
+                   double dt, int mode);
 
     double q0, q1, q2, q3;
     double roll, pitch, yaw;

@@ -166,12 +166,15 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
             imuCalibratedData.time = std::chrono::duration_cast<std::chrono::microseconds>(nowTime - lastTime).count() * 1e-6;
             lastTime = nowTime;
 
-            ahrs.updateIMU(imuCalibratedData.gyro_x, imuCalibratedData.gyro_y, imuCalibratedData.gyro_z,
-                           imuCalibratedData.accel_x, imuCalibratedData.accel_y, imuCalibratedData.accel_z,
-                           imuCalibratedData.time);
-        
             if (flyFlag) {
-                flyTime = nowTime.time_since_epoch().count() * 1e-9 - startFlyTime; // Convert to seconds
+                flyTime = nowTime.time_since_epoch().count() * 1e-9 - startFlyTime;
+
+                if(flyTime >= 0.05f)
+                    ahrs.updateIMU(imuCalibratedData.gyro_x, imuCalibratedData.gyro_y, imuCalibratedData.gyro_z,
+                                imuCalibratedData.accel_x, imuCalibratedData.accel_y, imuCalibratedData.accel_z,
+                                imuCalibratedData.time, 1);
+                }
+
                 std::cout << "Flight time: " << flyTime << " seconds" << std::endl;
                 if(flyTime > 4.0) {
                     flyFlag = 0;
@@ -197,6 +200,10 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
                 // Control logic based on vision detection
                 
             } else {
+                ahrs.updateIMU(imuCalibratedData.gyro_x, imuCalibratedData.gyro_y, imuCalibratedData.gyro_z,
+                               imuCalibratedData.accel_x, imuCalibratedData.accel_y, imuCalibratedData.accel_z,
+                               imuCalibratedData.time, 0);
+                               
                 if(imuCalibratedData.accel_x > 25) {
                     flyFlag = 1;
                     gpioWrite(servoPowerPin, 1);
@@ -204,7 +211,13 @@ void controllerThreadFunc(std::atomic<bool>& keepRunning) {
                     pitchControl = 0;
                     rollControl = 0;
                     rabbitServoController();
-                    startFlyTime = nowTime.time_since_epoch().count() * 1e-9; // Convert to seconds
+
+                    ahrs.q0 = cos(ahrs.pitch / 2);
+                    ahrs.q1 = 0.0f;
+                    ahrs.q2 = 0.0f;
+                    ahrs.q3 = sin(ahrs.pitch / 2);
+
+                    startFlyTime = nowTime.time_since_epoch().count() * 1e-9;
                 }
             }
         } else {

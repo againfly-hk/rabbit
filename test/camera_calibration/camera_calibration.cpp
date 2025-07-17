@@ -27,11 +27,9 @@ int main() {
     camera.set(cv::CAP_PROP_GAIN, 1);
 
     camera.set(cv::CAP_PROP_BRIGHTNESS, 50);
-    camera.set(cv::CAP_PROP_CONTRAST, 0);
-    camera.set(cv::CAP_PROP_SATURATION, 0);
-    camera.set(cv::CAP_PROP_SHARPNESS, 0);
-
-    camera.set(cv::CAP_PROP_MODE, 0);
+    camera.set(cv::CAP_PROP_CONTRAST, 50);
+    camera.set(cv::CAP_PROP_SATURATION, 50);
+    camera.set(cv::CAP_PROP_SHARPNESS, 50);
 
     if (!camera.open()) {
         std::cerr << "Failed to open camera!" << std::endl;

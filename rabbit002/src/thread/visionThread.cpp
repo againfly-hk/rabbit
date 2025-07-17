@@ -62,11 +62,9 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
     camera.set(cv::CAP_PROP_GAIN, 1);
 
     camera.set(cv::CAP_PROP_BRIGHTNESS, 50);
-    camera.set(cv::CAP_PROP_CONTRAST, 0);
-    camera.set(cv::CAP_PROP_SATURATION, 0);
-    camera.set(cv::CAP_PROP_SHARPNESS, 0);
-
-    camera.set(cv::CAP_PROP_MODE, 0);
+    camera.set(cv::CAP_PROP_CONTRAST, 50);
+    camera.set(cv::CAP_PROP_SATURATION, 50);
+    camera.set(cv::CAP_PROP_SHARPNESS, 50);
 
     if (!camera.open()) {
         std::cerr << "Failed to open camera!" << std::endl;
@@ -86,7 +84,6 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
             image_flag = 1;
             image_ready_flag = 1;
 
-            imshow("Frame", frame0);
             if (flyFlag) {
                 saveImage(frame0);
             }
@@ -97,7 +94,6 @@ void visionThreadFunc(std::atomic<bool>& keepRunning) {
                 break;
             }
 
-            imshow("Frame", frame1);
             image_flag = 0;
             image_ready_flag = 1;
             if (flyFlag) {
